@@ -1,31 +1,41 @@
 "use client";
 import { Loader2, Mail } from 'lucide-react'
 import React from 'react'
-import { useRouter } from 'next/navigation';
+import { redirect, useRouter } from 'next/navigation';
 import axios from 'axios';
+import { useAppData, user_service } from '@/src/context/AppContext';
+import Loading from '@/src/components/Loading';
+import toast from 'react-hot-toast';
 
 const LoginPage = () => {
-  const [email,setEmail] = React.useState<string>("");
-  const [loading,setLoading] = React.useState<boolean>(false);
+  const [email, setEmail] = React.useState<string>("");
+  const [loading, setLoading] = React.useState<boolean>(false);
   const router = useRouter();
+
+  const { isAuth, loading: userLoading } = useAppData();
 
   const handleSubmit = async (e: React.FormEvent<HTMLElement>) => {
     e.preventDefault();
     setLoading(true);
     try {
-      const {data} = await axios.post('http://localhost:5000/api/v1/login',{
+      const { data } = await axios.post(`${user_service}/api/v1/login`, {
         email,
       });
 
-      alert(data.message);
+      toast.success(data.message);
       router.push(`/verify?email=${email}`);
     } catch (error) {
-      console.error('Error submitting email:', error);
+      toast.error('Failed to submit email.');
     } finally {
       setLoading(false);
     }
   };
-
+  React.useEffect(() => {
+    if (isAuth) {
+      router.push("/");
+    }
+  }, [isAuth, router]);
+  if (userLoading) return <Loading />;
   return (
     <div className='min-h-screen bg-gray-900 flex items-center justify-center p-4'>
       <div className='max-w-md w-full'>
@@ -46,16 +56,16 @@ const LoginPage = () => {
                 className='bg-gray-700 border border-gray-500 placeholder:text-gray-400 text-white focus:ring-blue-500 focus:border-blue-500 block w-full p-3 rounded-lg'
                 placeholder='you@example.com'
                 required
-                onChange={(e)=>{setEmail(e.target.value)}}
+                onChange={(e) => { setEmail(e.target.value) }}
               />
             </div>
             <button
               type='submit'
-              className='w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-lg transition duration-200 disabled:cursor-not-allowed disabled:bg-gray-400'
+              className='w-full bg-blue-600 hover:bg-blue-700 hover:cursor-pointer text-white font-semibold py-3 rounded-lg transition duration-200 disabled:cursor-not-allowed disabled:bg-gray-400'
               disabled={loading}
               value={email}
-            > {loading? <div className='flex items-center justify-center gap-2'><Loader2 className='w-5 h-5' /> Sending OTP to your email...</div>:<div>Send Verification Code</div>}
-              
+            > {loading ? <div className='flex items-center justify-center gap-2'><Loader2 className='w-5 h-5' /> Sending OTP to your email...</div> : <div>Send Verification Code</div>}
+
             </button>
           </form>
         </div>

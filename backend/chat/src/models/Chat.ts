@@ -4,7 +4,7 @@ import mongoose, { Document, Schema } from "mongoose";
 export interface IChat extends Document {
     users: string[];
     latestMessage: {
-        text: string;
+        content: string;
         sender: string;
     };
     createdAt: Date;
@@ -14,7 +14,7 @@ export interface IChat extends Document {
 const chatSchema = new Schema<IChat>({
     users: [{ type: String, required: true }],
     latestMessage: {
-        text: String,
+        content: String,
         sender: String,
     },
 },
