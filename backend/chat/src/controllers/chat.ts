@@ -141,6 +141,7 @@ export const sendMessage = TryCatch(async (req: AuthenticatedRequest, res) => {
     }
 
     //socket setup
+    
     let messageData:any = {
         chatId,
         sender: userId,

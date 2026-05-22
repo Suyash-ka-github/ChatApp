@@ -50,6 +50,7 @@ interface AppContextType {
   chats: Chats[] | null;
   users: User[] | null;
   setChats: React.Dispatch<React.SetStateAction<Chats[] | null>>;
+  createChat: (u:any)=>Promise<void>;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -87,6 +88,23 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
     setUser(null);
     setIsAuth(false);
     toast.success("User Logged Out");
+  }
+  
+  async function createChat(u:any) {
+    console.log(u);
+    const token=Cookies.get('token');
+    try {
+      const { data } = await axios.post(`${chat_service}/api/v1/chat/new`,{
+        recipientId:u._id 
+      }, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      fetchChats();
+    } catch (error) {
+      console.log(error);
+    }
   }
 
   const [chats, setChats] = useState<Chats[] | null>(null);
@@ -143,6 +161,7 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
         chats,
         users,
         setChats,
+        createChat,
       }}
     >
       {children}
