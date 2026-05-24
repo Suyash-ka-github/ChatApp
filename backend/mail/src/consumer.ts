@@ -21,18 +21,16 @@ export const startSendOtpEmailConsumer = async () => {
                 try {
                     const {to,subject,body} = JSON.parse(msg.content.toString());
                     // Process the email sending logic here
-                    const transporter=nodemailer.createTransport({
-                        host:"smtp.gmail.com",
-                        port:465,
-                        secure:true,
-                        auth:{
+                    const transporter = nodemailer.createTransport({
+                        service: "gmail",
+                        auth: {
                             user: process.env.USER,
                             pass: process.env.PASSWORD,
-                        }
+                        },
                     });
 
                     await transporter.sendMail({
-                        from: "ChatApp",
+                        from: `"ChatApp" <${process.env.USER}>`,
                         to,
                         subject,
                         text: body,
